@@ -8,7 +8,7 @@
 - [ ] Teams publishing permissions available
 
 ## Configuration
-- [ ] Fill `.env` from `.env.example`
+- [ ] Fill `.env` from `config/.env.example`
 - [ ] Set Logic App callback URLs/signatures
 - [ ] Validate placeholders: `python3 scripts/validate_placeholders.py`
 - [ ] Validate config: `python3 app/fastapi/validate_config.py`
