@@ -7,7 +7,8 @@
 
 ## Routine Checks
 - Daily: failed Logic App runs and callback status.
-- Weekly: SQL row growth and drift/consistency metrics.
+- Weekly: SQL row growth, drift/consistency metrics, and citation doc-title distribution checks.
+- Weekly: verify no null `content_hash` or `baseline_run_id` in new `ReviewRun` rows.
 - Monthly: rotate callback signatures/keys and review access policies.
 
 ## Incident Response

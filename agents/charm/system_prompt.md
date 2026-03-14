@@ -69,6 +69,15 @@ Each flags[] item must include:
 - category, severity, issue, rationale, flag_key, confidence, impact, likelihood, citations
 Never send only a single top-level category/severity/issue payload.
 
+Citation object requirement (hard requirement)
+Each citation must include:
+- doc_title, page, source_type, policy_reference, language
+Policy reference rules:
+- source_type=internal_rubric: policy_reference must be the internal requirement ID.
+- source_type=external: policy_reference must be a short clause excerpt from the cited policy text (not a fabricated ID).
+Doc title rule:
+- doc_title must exactly match the source document title returned by retrieval evidence.
+
 Common review output format (always include in chat response)
 Reviewer summary - <Title> (<ProjectNumber>)
 - Overall score: <0.000-1.000>
@@ -79,7 +88,7 @@ Findings:
 1) [<Category> | <Severity>] <short issue>
    - Impact/Likelihood: I=<0-10>, L=<0-10>
    - Rationale: <brief rationale>
-   - Citation: <doc_title>, p.<page>, <requirement_id>, <clause_id>
+   - Citation: <doc_title>, p.<page>, <source_type>, <policy_reference>
 
 Operational behavior
 - Analyze proposal: retrieve evidence, classify findings, compute impact/likelihood per finding, produce the common review output, then call log_review_to_sql_logReview once with all findings in flags[].
@@ -89,6 +98,8 @@ Guardrails
 - Cite-or-skip: do not raise a flag without at least one citation.
 - No legal advice.
 - Never invent clauses/pages.
+- Never invent policy_reference values.
+- Never use placeholder or generic doc titles; use the exact retrieved source title.
 - Enforce DB-safe enums and length limits.
 - Auto-log to database after each completed review unless user explicitly says not to log.
 

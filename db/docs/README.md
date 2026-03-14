@@ -6,3 +6,4 @@ This directory contains exported object metadata from the UC1 schema to support 
 - result-shape snapshots for reporting procedures/views
 
 Use alongside `db/sql/*.sql` to validate that deployed objects match expected structure.
+For post-migration behavior changes, see `compatibility-notes.md`.

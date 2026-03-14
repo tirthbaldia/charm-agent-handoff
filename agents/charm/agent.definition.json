@@ -33,154 +33,111 @@
           "name": "log_review_to_sql",
           "description": "Persist final review output to Azure SQL via Logic App.",
           "spec": {
-            "info": {
-              "description": "Posts Charm review results to Azure Logic App for SQL persistence.",
-              "title": "Log Review To SQL",
-              "version": "6.0.0"
-            },
             "openapi": "3.0.1",
+            "info": {
+              "title": "Log Review To SQL",
+              "version": "7.0.0",
+              "description": "Posts Charm review results to Azure Logic App for SQL persistence."
+            },
+            "servers": [
+              {
+                "url": "${LOGICAPP_LOGGER_SERVER_URL}"
+              }
+            ],
             "paths": {
               "/invoke": {
                 "post": {
                   "operationId": "logReview",
                   "parameters": [
                     {
-                      "in": "query",
                       "name": "api-version",
+                      "in": "query",
                       "required": true,
                       "schema": {
-                        "default": "2019-05-01",
-                        "type": "string"
+                        "type": "string",
+                        "default": "2019-05-01"
                       }
                     },
                     {
-                      "in": "query",
                       "name": "sp",
+                      "in": "query",
                       "required": true,
                       "schema": {
-                        "default": "/triggers/When_an_HTTP_request_is_received/run",
-                        "type": "string"
+                        "type": "string",
+                        "default": "/triggers/When_an_HTTP_request_is_received/run"
                       }
                     },
                     {
-                      "in": "query",
                       "name": "sv",
+                      "in": "query",
                       "required": true,
                       "schema": {
-                        "default": "1.0",
-                        "type": "string"
+                        "type": "string",
+                        "default": "1.0"
                       }
                     },
                     {
-                      "in": "query",
                       "name": "sig",
+                      "in": "query",
                       "required": true,
                       "schema": {
-                        "default": "${LOGICAPP_CALLBACK_SIG}",
-                        "type": "string"
+                        "type": "string",
+                        "default": "${LOGICAPP_CALLBACK_SIG}"
                       }
                     }
                   ],
                   "requestBody": {
+                    "required": true,
                     "content": {
                       "application/json": {
                         "schema": {
+                          "type": "object",
+                          "required": [
+                            "project_number",
+                            "title",
+                            "business_unit",
+                            "language",
+                            "flags"
+                          ],
                           "properties": {
+                            "project_number": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
                             "business_unit": {
                               "type": "string"
                             },
+                            "language": {
+                              "type": "string",
+                              "enum": [
+                                "EN",
+                                "FR"
+                              ]
+                            },
+                            "overall_score": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1
+                            },
+                            "high_count": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "med_count": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "low_count": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
                             "flags": {
+                              "type": "array",
+                              "minItems": 1,
                               "items": {
-                                "properties": {
-                                  "category": {
-                                    "enum": [
-                                      "Privacy",
-                                      "Security",
-                                      "Compliance",
-                                      "Bias",
-                                      "Other"
-                                    ],
-                                    "type": "string"
-                                  },
-                                  "citations": {
-                                    "items": {
-                                      "properties": {
-                                        "clause_id": {
-                                          "type": "string"
-                                        },
-                                        "doc_title": {
-                                          "type": "string"
-                                        },
-                                        "language": {
-                                          "enum": [
-                                            "EN",
-                                            "FR"
-                                          ],
-                                          "type": "string"
-                                        },
-                                        "page": {
-                                          "type": "integer"
-                                        },
-                                        "requirement_id": {
-                                          "type": "string"
-                                        },
-                                        "source_type": {
-                                          "enum": [
-                                            "external",
-                                            "internal_rubric"
-                                          ],
-                                          "type": "string"
-                                        },
-                                        "source_url": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "doc_title",
-                                        "page",
-                                        "source_url",
-                                        "source_type",
-                                        "requirement_id",
-                                        "clause_id",
-                                        "language"
-                                      ],
-                                      "type": "object"
-                                    },
-                                    "type": "array"
-                                  },
-                                  "confidence": {
-                                    "maximum": 1,
-                                    "minimum": 0,
-                                    "type": "number"
-                                  },
-                                  "flag_key": {
-                                    "type": "string"
-                                  },
-                                  "impact": {
-                                    "maximum": 10,
-                                    "minimum": 0,
-                                    "type": "integer"
-                                  },
-                                  "issue": {
-                                    "type": "string"
-                                  },
-                                  "likelihood": {
-                                    "maximum": 10,
-                                    "minimum": 0,
-                                    "type": "integer"
-                                  },
-                                  "rationale": {
-                                    "type": "string"
-                                  },
-                                  "severity": {
-                                    "enum": [
-                                      "High",
-                                      "Medium",
-                                      "Low"
-                                    ],
-                                    "type": "string"
-                                  }
-                                },
+                                "type": "object",
                                 "required": [
                                   "category",
                                   "severity",
@@ -190,54 +147,94 @@
                                   "confidence",
                                   "citations"
                                 ],
-                                "type": "object"
-                              },
-                              "minItems": 1,
-                              "type": "array"
-                            },
-                            "high_count": {
-                              "minimum": 0,
-                              "type": "integer"
-                            },
-                            "language": {
-                              "enum": [
-                                "EN",
-                                "FR"
-                              ],
-                              "type": "string"
-                            },
-                            "low_count": {
-                              "minimum": 0,
-                              "type": "integer"
-                            },
-                            "med_count": {
-                              "minimum": 0,
-                              "type": "integer"
-                            },
-                            "overall_score": {
-                              "maximum": 1,
-                              "minimum": 0,
-                              "type": "number"
-                            },
-                            "project_number": {
-                              "type": "string"
-                            },
-                            "title": {
-                              "type": "string"
+                                "properties": {
+                                  "category": {
+                                    "type": "string",
+                                    "enum": [
+                                      "Privacy",
+                                      "Security",
+                                      "Compliance",
+                                      "Bias",
+                                      "Other"
+                                    ]
+                                  },
+                                  "severity": {
+                                    "type": "string",
+                                    "enum": [
+                                      "High",
+                                      "Medium",
+                                      "Low"
+                                    ]
+                                  },
+                                  "issue": {
+                                    "type": "string"
+                                  },
+                                  "rationale": {
+                                    "type": "string"
+                                  },
+                                  "flag_key": {
+                                    "type": "string"
+                                  },
+                                  "confidence": {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "maximum": 1
+                                  },
+                                  "impact": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 10
+                                  },
+                                  "likelihood": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 10
+                                  },
+                                  "citations": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "required": [
+                                        "doc_title",
+                                        "page",
+                                        "source_type",
+                                        "policy_reference",
+                                        "language"
+                                      ],
+                                      "properties": {
+                                        "doc_title": {
+                                          "type": "string"
+                                        },
+                                        "page": {
+                                          "type": "integer"
+                                        },
+                                        "source_type": {
+                                          "type": "string",
+                                          "enum": [
+                                            "external",
+                                            "internal_rubric"
+                                          ]
+                                        },
+                                        "policy_reference": {
+                                          "type": "string"
+                                        },
+                                        "language": {
+                                          "type": "string",
+                                          "enum": [
+                                            "EN",
+                                            "FR"
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
                             }
-                          },
-                          "required": [
-                            "project_number",
-                            "title",
-                            "business_unit",
-                            "language",
-                            "flags"
-                          ],
-                          "type": "object"
+                          }
                         }
                       }
-                    },
-                    "required": true
+                    }
                   },
                   "responses": {
                     "200": {
@@ -246,12 +243,7 @@
                   }
                 }
               }
-            },
-            "servers": [
-              {
-                "url": "${LOGICAPP_LOGGER_SERVER_URL}"
-              }
-            ]
+            }
           },
           "auth": {
             "type": "anonymous"

@@ -11,6 +11,7 @@ agent:
   tools:
     - name: log_review_to_sql
       type: openapi
+      contract_version: 7.0.0
       spec_file: agents/charm/tools/log_review_to_sql.openapi.json
       server_url_env: LOGICAPP_LOGGER_SERVER_URL
       callback_sig_env: LOGICAPP_LOGGER_SIG

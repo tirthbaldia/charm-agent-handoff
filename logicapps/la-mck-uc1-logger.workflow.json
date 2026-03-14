@@ -45,7 +45,7 @@
               "Run_AddCitation": {
                 "inputs": {
                   "body": {
-                    "query": "@{concat('EXEC uc1.AddCitation @flag_id=''', body('Run_UpsertFlag')?['ResultSets']?['Table1'][0]?['flag_id'], ''', @doc_title=N''', replace(coalesce(items('For_each_Citation')?['doc_title'],''),'''',''''''), ''', @page=', string(coalesce(items('For_each_Citation')?['page'], 'NULL')), ', @source_url=N''', replace(coalesce(items('For_each_Citation')?['source_url'],''),'''',''''''), ''', @source_type=''', replace(coalesce(items('For_each_Citation')?['source_type'],'external'),'''',''''''), ''', @requirement_id=N''', replace(string(coalesce(items('For_each_Citation')?['requirement_id'],'')),'''',''''''), ''', @clause_id=N''', replace(coalesce(items('For_each_Citation')?['clause_id'],''),'''',''''''), ''', @language=''', replace(coalesce(items('For_each_Citation')?['language'],'EN'),'''',''''''), '''; SELECT 1 AS ok;')}"
+                    "query": "@{concat('EXEC uc1.AddCitation @flag_id=''', body('Run_UpsertFlag')?['ResultSets']?['Table1'][0]?['flag_id'], ''', @doc_title=N''', replace(coalesce(items('For_each_Citation')?['doc_title'],''),'''',''''''), ''', @page=', string(coalesce(items('For_each_Citation')?['page'], 'NULL')), ', @source_type=''', replace(coalesce(items('For_each_Citation')?['source_type'],'external'),'''',''''''), ''', @policy_reference=N''', replace(coalesce(items('For_each_Citation')?['policy_reference'],''),'''',''''''), ''', @language=''', replace(coalesce(items('For_each_Citation')?['language'],'EN'),'''',''''''), '''; SELECT 1 AS ok;')}"
                   },
                   "host": {
                     "connection": {
@@ -128,7 +128,7 @@
       "Run_UpsertReview": {
         "inputs": {
           "body": {
-            "query": "@{if(greater(length(coalesce(triggerBody()?['flags'], createArray())),0), concat('DECLARE @run uniqueidentifier; EXEC uc1.UpsertReview @project_number=N''', replace(coalesce(triggerBody()?['project_number'],''),'''',''''''), ''', @title=N''', replace(coalesce(triggerBody()?['title'],''),'''',''''''), ''', @business_unit=N''', replace(coalesce(triggerBody()?['business_unit'],''),'''',''''''), ''', @language=''', replace(coalesce(triggerBody()?['language'],'EN'),'''',''''''), ''', @overall_score=', string(coalesce(triggerBody()?['overall_score'],'NULL')), ', @content_hash=NULL, @model_id=''charm-agent'', @prompt_version=''v6'', @high_count=', string(coalesce(triggerBody()?['high_count'],0)), ', @med_count=', string(coalesce(triggerBody()?['med_count'],0)), ', @low_count=', string(coalesce(triggerBody()?['low_count'],0)), ', @run_id=@run OUTPUT; SELECT CONVERT(varchar(36),@run) AS run_id;'), 'THROW 50000, ''FLAGS_REQUIRED'', 1;')}\n"
+            "query": "@{if(greater(length(coalesce(triggerBody()?['flags'], createArray())),0), concat('DECLARE @run uniqueidentifier; EXEC uc1.UpsertReview @project_number=N''', replace(coalesce(triggerBody()?['project_number'],''),'''',''''''), ''', @title=N''', replace(coalesce(triggerBody()?['title'],''),'''',''''''), ''', @business_unit=N''', replace(coalesce(triggerBody()?['business_unit'],''),'''',''''''), ''', @language=''', replace(coalesce(triggerBody()?['language'],'EN'),'''',''''''), ''', @overall_score=', string(coalesce(triggerBody()?['overall_score'],'NULL')), ', @content_hash=NULL, @model_id=''charm-agent'', @prompt_version=''v7'', @high_count=', string(coalesce(triggerBody()?['high_count'],0)), ', @med_count=', string(coalesce(triggerBody()?['med_count'],0)), ', @low_count=', string(coalesce(triggerBody()?['low_count'],0)), ', @run_id=@run OUTPUT; SELECT CONVERT(varchar(36),@run) AS run_id;'), 'THROW 50000, ''FLAGS_REQUIRED'', 1;')}\n"
           },
           "host": {
             "connection": {
@@ -164,33 +164,27 @@
               "citations": {
                 "items": {
                   "properties": {
-                    "clause_id": {
-                      "type": "string"
-                    },
                     "doc_title": {
-                      "type": "string"
-                    },
-                    "language": {
                       "type": "string"
                     },
                     "page": {
                       "type": "integer"
                     },
-                    "requirement_id": {},
                     "source_type": {
                       "type": "string"
                     },
-                    "source_url": {
+                    "policy_reference": {
+                      "type": "string"
+                    },
+                    "language": {
                       "type": "string"
                     }
                   },
                   "required": [
                     "doc_title",
                     "page",
-                    "source_url",
                     "source_type",
-                    "requirement_id",
-                    "clause_id",
+                    "policy_reference",
                     "language"
                   ],
                   "type": "object"
@@ -218,33 +212,27 @@
                     "citations": {
                       "items": {
                         "properties": {
-                          "clause_id": {
-                            "type": "string"
-                          },
                           "doc_title": {
-                            "type": "string"
-                          },
-                          "language": {
                             "type": "string"
                           },
                           "page": {
                             "type": "integer"
                           },
-                          "requirement_id": {},
                           "source_type": {
                             "type": "string"
                           },
-                          "source_url": {
+                          "policy_reference": {
+                            "type": "string"
+                          },
+                          "language": {
                             "type": "string"
                           }
                         },
                         "required": [
                           "doc_title",
                           "page",
-                          "source_url",
                           "source_type",
-                          "requirement_id",
-                          "clause_id",
+                          "policy_reference",
                           "language"
                         ],
                         "type": "object"

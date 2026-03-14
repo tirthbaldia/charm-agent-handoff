@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Log Review To SQL",
-    "version": "6.0.0",
+    "version": "7.0.0",
     "description": "Posts Charm review results to Azure Logic App for SQL persistence."
   },
   "servers": [
@@ -163,10 +163,8 @@
                             "required": [
                               "doc_title",
                               "page",
-                              "source_url",
                               "source_type",
-                              "requirement_id",
-                              "clause_id",
+                              "policy_reference",
                               "language"
                             ],
                             "properties": {
@@ -176,9 +174,6 @@
                               "page": {
                                 "type": "integer"
                               },
-                              "source_url": {
-                                "type": "string"
-                              },
                               "source_type": {
                                 "type": "string",
                                 "enum": [
@@ -186,10 +181,7 @@
                                   "internal_rubric"
                                 ]
                               },
-                              "requirement_id": {
-                                "type": "string"
-                              },
-                              "clause_id": {
+                              "policy_reference": {
                                 "type": "string"
                               },
                               "language": {

@@ -15,7 +15,7 @@
 
 ## Deployment
 - [ ] Deploy infra with Bicep (`infra/bicep`)
-- [ ] Apply SQL scripts in order (`db/sql`)
+- [ ] Apply SQL scripts in order (`db/sql`) and run the upgrade/backfill script for existing databases
 - [ ] Deploy logic app workflows (`logicapps`)
 - [ ] Configure Foundry agent prompt + tools from `agents/charm`
 

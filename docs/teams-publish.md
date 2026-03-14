@@ -22,5 +22,5 @@ Publish the Foundry `Charm` agent to Teams while keeping all definitions in this
 
 ## Acceptance Criteria
 - Teams user can run review and receive response.
-- SQL receives review run/flags/citations.
+- SQL receives review run/flags/citations using `policy_reference` (no `source_url`/`clause_id` fields).
 - History query from Teams returns expected rows.

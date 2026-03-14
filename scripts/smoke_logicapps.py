@@ -53,10 +53,8 @@ def main() -> int:
                         {
                             'doc_title': 'Smoke Doc',
                             'page': 1,
-                            'source_url': 'https://example.com',
                             'source_type': 'external',
-                            'requirement_id': 'REQ-1',
-                            'clause_id': 'CL-1',
+                            'policy_reference': 'Data minimization requirement',
                             'language': 'EN',
                         }
                     ],

@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SQL_DIR = ROOT / 'db' / 'sql'
 REQUIRED = [
     '00_uc1_schema_tables_constraints_indexes.sql',
+    '05_uc1_upgrade_policy_reference_and_reviewrun_backfill.sql',
     '10_uc1_procedures.sql',
     '20_uc1_views.sql',
     '30_uc1_smoke_tests.sql',

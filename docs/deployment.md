@@ -12,10 +12,13 @@ az deployment sub create \
 
 ## 2) SQL Schema
 Apply scripts in order:
-1. `db/sql/00_uc1_schema_tables_constraints_indexes.sql`
-2. `db/sql/10_uc1_procedures.sql`
-3. `db/sql/20_uc1_views.sql`
-4. `db/sql/30_uc1_smoke_tests.sql`
+1. `db/sql/00_uc1_schema_tables_constraints_indexes.sql` (fresh build only)
+2. `db/sql/05_uc1_upgrade_policy_reference_and_reviewrun_backfill.sql` (existing DB upgrade/backfill)
+3. `db/sql/10_uc1_procedures.sql`
+4. `db/sql/20_uc1_views.sql`
+5. `db/sql/30_uc1_smoke_tests.sql`
+
+For in-place upgrades, run steps `2-5` (skip `00` to preserve data).
 
 ## 3) Logic Apps
 - Deploy or update workflow definitions in `logicapps/`.

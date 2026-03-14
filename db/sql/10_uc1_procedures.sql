@@ -7,15 +7,13 @@ CREATE   PROC uc1.AddCitation
  @flag_id        uniqueidentifier,
  @doc_title      nvarchar(255),
  @page           int=NULL,
- @source_url     nvarchar(2048)=NULL,
  @source_type    varchar(16),         -- external|internal_rubric
- @requirement_id nvarchar(50)=NULL,
- @clause_id      nvarchar(50)=NULL,
+ @policy_reference nvarchar(255)=NULL,
  @language       char(2)=NULL
 AS
 BEGIN
-  INSERT uc1.Citation(flag_id,doc_title,page,source_url,source_type,requirement_id,clause_id,language)
-  VALUES(@flag_id,@doc_title,@page,@source_url,@source_type,@requirement_id,@clause_id,@language);
+  INSERT uc1.Citation(flag_id,doc_title,page,source_type,policy_reference,language)
+  VALUES(@flag_id,@doc_title,@page,@source_type,@policy_reference,@language);
 END
 
 GO
@@ -64,10 +62,8 @@ BEGIN
                     CONCAT(
                         LOWER(LTRIM(RTRIM(COALESCE(c.doc_title,'')))), N'~',
                         COALESCE(CAST(c.page AS nvarchar(20)), N''), N'~',
-                        LOWER(LTRIM(RTRIM(COALESCE(c.source_url,'')))), N'~',
                         LOWER(LTRIM(RTRIM(COALESCE(c.source_type,'')))), N'~',
-                        LOWER(LTRIM(RTRIM(COALESCE(c.requirement_id,'')))), N'~',
-                        LOWER(LTRIM(RTRIM(COALESCE(c.clause_id,'')))), N'~',
+                        LOWER(LTRIM(RTRIM(COALESCE(c.policy_reference,'')))), N'~',
                         LOWER(LTRIM(RTRIM(COALESCE(c.language,''))))
                     ) AS nvarchar(max)
                 ),
@@ -76,10 +72,8 @@ BEGIN
                 ORDER BY
                     LOWER(LTRIM(RTRIM(COALESCE(c.doc_title,'')))),
                     COALESCE(c.page,-1),
-                    LOWER(LTRIM(RTRIM(COALESCE(c.source_url,'')))),
                     LOWER(LTRIM(RTRIM(COALESCE(c.source_type,'')))),
-                    LOWER(LTRIM(RTRIM(COALESCE(c.requirement_id,'')))),
-                    LOWER(LTRIM(RTRIM(COALESCE(c.clause_id,'')))),
+                    LOWER(LTRIM(RTRIM(COALESCE(c.policy_reference,'')))),
                     LOWER(LTRIM(RTRIM(COALESCE(c.language,''))))
             ) AS citation_signature
         FROM uc1.Flag f
@@ -161,8 +155,9 @@ BEGIN
     BEGIN
         UPDATE rr
         SET rr.run_signature_hash = @current_hash,
+            rr.content_hash = @current_hash,
             rr.is_drift = 0,
-            rr.baseline_run_id = NULL,
+            rr.baseline_run_id = @current_run_id,
             rr.consistency_status = 'Baseline',
             rr.is_final = 1
         FROM uc1.ReviewRun rr
@@ -172,6 +167,7 @@ BEGIN
     BEGIN
         UPDATE rr
         SET rr.run_signature_hash = @current_hash,
+            rr.content_hash = @current_hash,
             rr.is_drift = 0,
             rr.baseline_run_id = @previous_run_id,
             rr.consistency_status = 'Match',
@@ -183,6 +179,7 @@ BEGIN
     BEGIN
         UPDATE rr
         SET rr.run_signature_hash = @current_hash,
+            rr.content_hash = @current_hash,
             rr.is_drift = 1,
             rr.baseline_run_id = @previous_run_id,
             rr.consistency_status = 'Drift',
@@ -535,4 +532,3 @@ BEGIN
 END;
 
 GO
-

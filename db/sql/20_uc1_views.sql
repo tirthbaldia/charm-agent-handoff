@@ -62,10 +62,8 @@ CREATE   VIEW uc1.vw_FlagList AS
         COALESCE(cr.citation_count,0) AS citation_count,
         c.doc_title,
         c.page,
-        c.source_url,
         c.source_type,
-        c.requirement_id,
-        c.clause_id,
+        c.policy_reference,
         c.language AS citation_lang
     FROM uc1.ReviewRun rr
     JOIN uc1.Proposal p ON p.project_number = rr.project_number
@@ -254,4 +252,3 @@ LEFT JOIN run_cited rc ON rc.run_id=lr.run_id
 WHERE lr.rn=1;
 
 GO
-

@@ -15,6 +15,7 @@ REQUIRED_FILES = [
     'logicapps/la-mck-uc1-logger.workflow.json',
     'logicapps/la-mck-uc1-reader.workflow.json',
     'db/sql/00_uc1_schema_tables_constraints_indexes.sql',
+    'db/sql/05_uc1_upgrade_policy_reference_and_reviewrun_backfill.sql',
     'db/sql/10_uc1_procedures.sql',
     'db/sql/20_uc1_views.sql',
     'db/sql/30_uc1_smoke_tests.sql',
@@ -32,7 +33,7 @@ def main() -> int:
     logger = json.loads((ROOT / 'agents/charm/tools/log_review_to_sql.openapi.json').read_text())
     required = logger['paths']['/invoke']['post']['requestBody']['content']['application/json']['schema']['required']
     if 'flags' not in required:
-        print('Logger OpenAPI schema is not v6 flags[] compatible.')
+        print('Logger OpenAPI schema is not flags[] compatible.')
         return 1
 
     print('Export snapshot validation passed.')
