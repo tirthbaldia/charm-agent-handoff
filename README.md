@@ -1,5 +1,11 @@
 # charm-agent-handoff
 
+## Client Start Here
+1. Read [docs/architecture.md](docs/architecture.md) for the end-to-end design (Teams -> Foundry Agent -> Logic Apps -> Azure SQL -> Power BI).
+2. Fill required placeholders from [config/.env.example](config/.env.example) and [docs/configuration-matrix.md](docs/configuration-matrix.md).
+3. Follow [docs/deployment.md](docs/deployment.md) to provision Azure resources and deploy SQL + Logic Apps.
+4. Publish the agent to Teams using [docs/teams-publish.md](docs/teams-publish.md), then run checks in [docs/client-onboarding-checklist.md](docs/client-onboarding-checklist.md).
+
 Customer-owned hand-off package for the UC1 Charm solution.
 
 This repository externalizes the production setup from Azure AI Foundry UI into source-controlled assets:
