@@ -1,0 +1,5 @@
+FK_Citation_Flag|Citation|flag_id|Flag|flag_id
+FK_Flag_Run|Flag|run_id|ReviewRun|run_id
+FK_ReviewRun_BaselineRun|ReviewRun|baseline_run_id|ReviewRun|run_id
+FK_ReviewRun_Proposal|ReviewRun|project_number|Proposal|project_number
+

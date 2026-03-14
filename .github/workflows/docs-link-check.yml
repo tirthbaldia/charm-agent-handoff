@@ -1,0 +1,14 @@
+name: Docs Link Check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  docs-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate markdown links
+        run: |
+          python3 scripts/check_docs_links.py

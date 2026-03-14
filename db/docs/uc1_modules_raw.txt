@@ -1,0 +1,2 @@
+mssql: login error: Database '${SQL_DATABASE_NAME}' on server '${SQL_SERVER_FQDN}' is not currently available.  Please retry the connection later.  If the problem persists, contact customer support, and provide them the session tracing ID of '{5B258C0E-8203-45A3-9738-0002B06201D3}'.
+mssql: login error: Database '${SQL_DATABASE_NAME}' on server '${SQL_SERVER_FQDN}' is not currently available.  Please retry the connection later.  If the problem persists, contact customer support, and provide them the session tracing ID of '{5B258C0E-8203-45A3-9738-0002B06201D3}'.

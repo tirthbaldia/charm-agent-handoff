@@ -1,0 +1,6 @@
+uc1|vw_DashboardMonthlyTrend
+uc1|vw_DashboardRiskTypeSeverity
+uc1|vw_FlagList
+uc1|vw_ProjectRiskMatrix
+uc1|vw_ProposalSummary
+

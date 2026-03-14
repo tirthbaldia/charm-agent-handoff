@@ -1,0 +1,78 @@
+{
+  "name": "${LOGICAPP_READER_NAME}",
+  "location": "${AZURE_LOCATION}",
+  "type": "Microsoft.Logic/workflows",
+  "state": "Enabled",
+  "parameters": {
+    "$connections": {
+      "value": {
+        "sql": {
+          "connectionId": "/subscriptions/${AZURE_SUBSCRIPTION_ID}/resourceGroups/${AZURE_RESOURCE_GROUP}/providers/Microsoft.Web/connections/${SQL_API_CONNECTION_NAME}",
+          "connectionName": "${SQL_API_CONNECTION_NAME}",
+          "connectionProperties": {},
+          "id": "/subscriptions/${AZURE_SUBSCRIPTION_ID}/providers/Microsoft.Web/locations/${AZURE_LOCATION}/managedApis/sql"
+        }
+      }
+    }
+  },
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "Response": {
+        "inputs": {
+          "body": "@{json(concat('{\"status\":\"ok\",\"rows\":', string(coalesce(body('Run_GetReviews')?['ResultSets']?['Table1'], json('[]'))), ',\"row_count\":', string(length(coalesce(body('Run_GetReviews')?['ResultSets']?['Table1'], json('[]')))), '}'))}",
+          "statusCode": 200
+        },
+        "runAfter": {
+          "Run_GetReviews": [
+            "Succeeded"
+          ]
+        },
+        "type": "Response"
+      },
+      "Run_GetReviews": {
+        "inputs": {
+          "body": {
+            "query": "@{concat('EXEC uc1.GetReviews @project_number=', if(equals(trim(string(coalesce(triggerBody()?['project_number'],''))),''), 'NULL', concat('N''', replace(string(triggerBody()?['project_number']),'''',''''''), '''')), ', @top_n=', string(coalesce(triggerBody()?['top_n'], 20)), ';')}"
+          },
+          "host": {
+            "connection": {
+              "name": "@parameters('$connections')['sql']['connectionId']"
+            }
+          },
+          "method": "post",
+          "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('${SQL_SERVER_FQDN}'))},@{encodeURIComponent(encodeURIComponent('${SQL_DATABASE_NAME}'))}/query/sql"
+        },
+        "type": "ApiConnection"
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {},
+    "parameters": {
+      "$connections": {
+        "defaultValue": {},
+        "type": "Object"
+      }
+    },
+    "triggers": {
+      "When_an_HTTP_request_is_received": {
+        "inputs": {
+          "method": "POST",
+          "schema": {
+            "properties": {
+              "project_number": {
+                "type": "string"
+              },
+              "top_n": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "kind": "Http",
+        "type": "Request"
+      }
+    }
+  }
+}

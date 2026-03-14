@@ -1,0 +1,7 @@
+uc1|AddCitation
+uc1|FinalizeReview
+uc1|GetFlags
+uc1|GetReviews
+uc1|UpsertFlag
+uc1|UpsertReview
+

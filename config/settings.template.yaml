@@ -1,0 +1,18 @@
+runtime:
+  model: "${FOUNDRY_MODEL_DEPLOYMENT_NAME}"
+  foundry_endpoint: "${FOUNDRY_PROJECT_ENDPOINT}"
+  teams_publish_mode: "foundry-direct"
+
+logicapps:
+  logger_server_url: "${LOGICAPP_LOGGER_SERVER_URL}"
+  reader_server_url: "${LOGICAPP_READER_SERVER_URL}"
+  logger_sig_env: "LOGICAPP_LOGGER_SIG"
+  reader_sig_env: "LOGICAPP_READER_SIG"
+
+sql:
+  server_fqdn: "${SQL_SERVER_FQDN}"
+  database_name: "${SQL_DATABASE_NAME}"
+
+security:
+  key_vault_name: "${KEYVAULT_NAME}"
+  rotate_callback_signatures_before_go_live: true

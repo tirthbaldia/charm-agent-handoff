@@ -1,0 +1,13 @@
+Citation|IX_Citation_Flag|0|flag_id|1
+Citation|PK__Citation__D5F92E71EB6D2116|1|citation_id|1
+Flag|IX_Flag_Category|0|category|1
+Flag|IX_Flag_ProjectSeverity|0|project_number|1
+Flag|IX_Flag_ProjectSeverity|0|severity|2
+Flag|PK__Flag__E8E91D3BC096F809|1|flag_id|1
+Flag|UX_Flag_Run_FlagKey|1|run_id|1
+Flag|UX_Flag_Run_FlagKey|1|flag_key|2
+Proposal|PK__Proposal__5C6A7B0DBCD16DF6|1|project_number|1
+ReviewRun|IX_ReviewRun_ProjectTime|0|project_number|1
+ReviewRun|IX_ReviewRun_ProjectTime|0|run_ts_utc|2
+ReviewRun|PK__ReviewRu__7D3D901BC9CB3AE6|1|run_id|1
+

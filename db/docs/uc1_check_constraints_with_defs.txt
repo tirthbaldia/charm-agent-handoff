@@ -1,0 +1,7 @@
+Citation|CK__Citation__source__151B244E|([source_type]='internal_rubric' OR [source_type]='external')
+Flag|CK_Flag_Category|([category]='Bias' OR [category]='Compliance' OR [category]='Security' OR [category]='Privacy' OR [category]='Other')
+Flag|CK_Flag_Impact|([impact] IS NULL OR [impact]>=(0) AND [impact]<=(10))
+Flag|CK_Flag_Likelihood|([likelihood] IS NULL OR [likelihood]>=(0) AND [likelihood]<=(10))
+Flag|CK_Flag_Severity|([severity]='Low' OR [severity]='Medium' OR [severity]='High')
+ReviewRun|CK_ReviewRun_ConsistencyStatus|([consistency_status]='Drift' OR [consistency_status]='Match' OR [consistency_status]='Baseline')
+

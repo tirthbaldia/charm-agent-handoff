@@ -1,0 +1,34 @@
+agent:
+  name: ${AGENT_NAME}
+  source: azure-ai-foundry
+  runtime_model: foundry-direct-to-teams
+  foundry:
+    project_endpoint: ${FOUNDRY_PROJECT_ENDPOINT}
+    project_name: ${FOUNDRY_PROJECT_NAME}
+    model_deployment_name: ${FOUNDRY_MODEL_DEPLOYMENT_NAME}
+  prompt:
+    file: agents/charm/system_prompt.md
+  tools:
+    - name: log_review_to_sql
+      type: openapi
+      spec_file: agents/charm/tools/log_review_to_sql.openapi.json
+      server_url_env: LOGICAPP_LOGGER_SERVER_URL
+      callback_sig_env: LOGICAPP_LOGGER_SIG
+    - name: read_reviews_from_sql
+      type: openapi
+      spec_file: agents/charm/tools/read_reviews_from_sql.openapi.json
+      server_url_env: LOGICAPP_READER_SERVER_URL
+      callback_sig_env: LOGICAPP_READER_SIG
+    - name: file_search
+      vector_store_id_env: VECTOR_STORE_ID
+    - name: memory_search
+      memory_store_name_env: MEMORY_STORE_NAME
+
+logicapps:
+  logger_workflow_file: logicapps/la-mck-uc1-logger.workflow.json
+  reader_workflow_file: logicapps/la-mck-uc1-reader.workflow.json
+
+sql:
+  server_fqdn_env: SQL_SERVER_FQDN
+  database_name_env: SQL_DATABASE_NAME
+  schema_path: db/sql

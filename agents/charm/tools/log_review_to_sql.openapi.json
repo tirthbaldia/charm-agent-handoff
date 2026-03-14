@@ -1,0 +1,221 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Log Review To SQL",
+    "version": "6.0.0",
+    "description": "Posts Charm review results to Azure Logic App for SQL persistence."
+  },
+  "servers": [
+    {
+      "url": "${LOGICAPP_LOGGER_SERVER_URL}"
+    }
+  ],
+  "paths": {
+    "/invoke": {
+      "post": {
+        "operationId": "logReview",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "2019-05-01"
+            }
+          },
+          {
+            "name": "sp",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "/triggers/When_an_HTTP_request_is_received/run"
+            }
+          },
+          {
+            "name": "sv",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "1.0"
+            }
+          },
+          {
+            "name": "sig",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "${LOGICAPP_CALLBACK_SIG}"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "project_number",
+                  "title",
+                  "business_unit",
+                  "language",
+                  "flags"
+                ],
+                "properties": {
+                  "project_number": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "business_unit": {
+                    "type": "string"
+                  },
+                  "language": {
+                    "type": "string",
+                    "enum": [
+                      "EN",
+                      "FR"
+                    ]
+                  },
+                  "overall_score": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "high_count": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "med_count": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "low_count": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "flags": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "category",
+                        "severity",
+                        "issue",
+                        "rationale",
+                        "flag_key",
+                        "confidence",
+                        "citations"
+                      ],
+                      "properties": {
+                        "category": {
+                          "type": "string",
+                          "enum": [
+                            "Privacy",
+                            "Security",
+                            "Compliance",
+                            "Bias",
+                            "Other"
+                          ]
+                        },
+                        "severity": {
+                          "type": "string",
+                          "enum": [
+                            "High",
+                            "Medium",
+                            "Low"
+                          ]
+                        },
+                        "issue": {
+                          "type": "string"
+                        },
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "flag_key": {
+                          "type": "string"
+                        },
+                        "confidence": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        },
+                        "impact": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 10
+                        },
+                        "likelihood": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 10
+                        },
+                        "citations": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "doc_title",
+                              "page",
+                              "source_url",
+                              "source_type",
+                              "requirement_id",
+                              "clause_id",
+                              "language"
+                            ],
+                            "properties": {
+                              "doc_title": {
+                                "type": "string"
+                              },
+                              "page": {
+                                "type": "integer"
+                              },
+                              "source_url": {
+                                "type": "string"
+                              },
+                              "source_type": {
+                                "type": "string",
+                                "enum": [
+                                  "external",
+                                  "internal_rubric"
+                                ]
+                              },
+                              "requirement_id": {
+                                "type": "string"
+                              },
+                              "clause_id": {
+                                "type": "string"
+                              },
+                              "language": {
+                                "type": "string",
+                                "enum": [
+                                  "EN",
+                                  "FR"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logged"
+          }
+        }
+      }
+    }
+  }
+}

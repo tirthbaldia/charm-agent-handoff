@@ -1,0 +1,356 @@
+{
+  "name": "${LOGICAPP_LOGGER_NAME}",
+  "location": "${AZURE_LOCATION}",
+  "type": "Microsoft.Logic/workflows",
+  "state": "Enabled",
+  "parameters": {
+    "$connections": {
+      "value": {
+        "sql": {
+          "connectionId": "/subscriptions/${AZURE_SUBSCRIPTION_ID}/resourceGroups/${AZURE_RESOURCE_GROUP}/providers/Microsoft.Web/connections/${SQL_API_CONNECTION_NAME}",
+          "connectionName": "${SQL_API_CONNECTION_NAME}",
+          "connectionProperties": {},
+          "id": "/subscriptions/${AZURE_SUBSCRIPTION_ID}/providers/Microsoft.Web/locations/${AZURE_LOCATION}/managedApis/sql"
+        }
+      }
+    }
+  },
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "Finalize_Review": {
+        "inputs": {
+          "body": {
+            "query": "@{concat('EXEC uc1.FinalizeReview @project_number=N''', replace(coalesce(triggerBody()?['project_number'],''),'''',''''''), '''; SELECT 1 AS ok;')}"
+          },
+          "host": {
+            "connection": {
+              "name": "@parameters('$connections')['sql']['connectionId']"
+            }
+          },
+          "method": "post",
+          "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('${SQL_SERVER_FQDN}'))},@{encodeURIComponent(encodeURIComponent('${SQL_DATABASE_NAME}'))}/query/sql"
+        },
+        "runAfter": {
+          "For_each_Flag": [
+            "Succeeded"
+          ]
+        },
+        "type": "ApiConnection"
+      },
+      "For_each_Flag": {
+        "actions": {
+          "For_each_Citation": {
+            "actions": {
+              "Run_AddCitation": {
+                "inputs": {
+                  "body": {
+                    "query": "@{concat('EXEC uc1.AddCitation @flag_id=''', body('Run_UpsertFlag')?['ResultSets']?['Table1'][0]?['flag_id'], ''', @doc_title=N''', replace(coalesce(items('For_each_Citation')?['doc_title'],''),'''',''''''), ''', @page=', string(coalesce(items('For_each_Citation')?['page'], 'NULL')), ', @source_url=N''', replace(coalesce(items('For_each_Citation')?['source_url'],''),'''',''''''), ''', @source_type=''', replace(coalesce(items('For_each_Citation')?['source_type'],'external'),'''',''''''), ''', @requirement_id=N''', replace(string(coalesce(items('For_each_Citation')?['requirement_id'],'')),'''',''''''), ''', @clause_id=N''', replace(coalesce(items('For_each_Citation')?['clause_id'],''),'''',''''''), ''', @language=''', replace(coalesce(items('For_each_Citation')?['language'],'EN'),'''',''''''), '''; SELECT 1 AS ok;')}"
+                  },
+                  "host": {
+                    "connection": {
+                      "name": "@parameters('$connections')['sql']['connectionId']"
+                    }
+                  },
+                  "method": "post",
+                  "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('${SQL_SERVER_FQDN}'))},@{encodeURIComponent(encodeURIComponent('${SQL_DATABASE_NAME}'))}/query/sql"
+                },
+                "runAfter": {},
+                "type": "ApiConnection"
+              }
+            },
+            "foreach": "@coalesce(items('For_each_Flag')?['citations'], createArray())",
+            "runAfter": {
+              "Run_UpsertFlag": [
+                "Succeeded"
+              ]
+            },
+            "type": "Foreach"
+          },
+          "Run_UpsertFlag": {
+            "inputs": {
+              "body": {
+                "query": "@{concat('EXEC uc1.UpsertFlag @project_number=N''', replace(coalesce(items('For_each_Flag')?['project_number'], triggerBody()?['project_number'],''),'''',''''''), ''', @title=N''', replace(coalesce(items('For_each_Flag')?['title'], triggerBody()?['title'],''),'''',''''''), ''', @business_unit=N''', replace(coalesce(items('For_each_Flag')?['business_unit'], triggerBody()?['business_unit'],''),'''',''''''), ''', @language=''', replace(coalesce(items('For_each_Flag')?['language'], triggerBody()?['language'],'EN'),'''',''''''), ''', @run_id=''', body('Run_UpsertReview')?['ResultSets']?['Table1'][0]?['run_id'], ''', @category=''', replace(coalesce(items('For_each_Flag')?['category'],''),'''',''''''), ''', @severity=''', replace(coalesce(items('For_each_Flag')?['severity'],''),'''',''''''), ''', @issue=N''', replace(coalesce(items('For_each_Flag')?['issue'],''),'''',''''''), ''', @rationale=N''', replace(coalesce(items('For_each_Flag')?['rationale'],''),'''',''''''), ''', @flag_key=''', replace(coalesce(items('For_each_Flag')?['flag_key'], concat(coalesce(items('For_each_Flag')?['category'],''),'-',coalesce(items('For_each_Flag')?['severity'],''),'-',substring(replace(guid(),'-',''),0,8))),'''',''''''), ''', @confidence=', string(coalesce(items('For_each_Flag')?['confidence'],0.8)), ', @impact=', string(coalesce(items('For_each_Flag')?['impact'],'NULL')), ', @likelihood=', string(coalesce(items('For_each_Flag')?['likelihood'],'NULL')), ';')}"
+              },
+              "host": {
+                "connection": {
+                  "name": "@parameters('$connections')['sql']['connectionId']"
+                }
+              },
+              "method": "post",
+              "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('${SQL_SERVER_FQDN}'))},@{encodeURIComponent(encodeURIComponent('${SQL_DATABASE_NAME}'))}/query/sql"
+            },
+            "runAfter": {},
+            "type": "ApiConnection"
+          }
+        },
+        "foreach": "@triggerBody()?['flags']",
+        "runAfter": {
+          "Run_UpsertReview": [
+            "Succeeded"
+          ]
+        },
+        "type": "Foreach"
+      },
+      "Response": {
+        "inputs": {
+          "body": {
+            "flags_logged": "@{length(coalesce(triggerBody()?['flags'], createArray(triggerBody())))}",
+            "project_number": "@{triggerBody()?['project_number']}",
+            "run_id": "@{body('Run_UpsertReview')?['ResultSets']?['Table1'][0]?['run_id']}",
+            "status": "ok"
+          },
+          "statusCode": 200
+        },
+        "runAfter": {
+          "Finalize_Review": [
+            "Succeeded"
+          ]
+        },
+        "type": "Response"
+      },
+      "Response_InvalidPayload": {
+        "inputs": {
+          "body": {
+            "message": "Invalid payload: expected top-level flags array. Start a new chat thread and resend review using the updated tool schema.",
+            "status": "error"
+          },
+          "statusCode": 400
+        },
+        "runAfter": {
+          "For_each_Flag": [
+            "Failed",
+            "Skipped"
+          ]
+        },
+        "type": "Response"
+      },
+      "Run_UpsertReview": {
+        "inputs": {
+          "body": {
+            "query": "@{if(greater(length(coalesce(triggerBody()?['flags'], createArray())),0), concat('DECLARE @run uniqueidentifier; EXEC uc1.UpsertReview @project_number=N''', replace(coalesce(triggerBody()?['project_number'],''),'''',''''''), ''', @title=N''', replace(coalesce(triggerBody()?['title'],''),'''',''''''), ''', @business_unit=N''', replace(coalesce(triggerBody()?['business_unit'],''),'''',''''''), ''', @language=''', replace(coalesce(triggerBody()?['language'],'EN'),'''',''''''), ''', @overall_score=', string(coalesce(triggerBody()?['overall_score'],'NULL')), ', @content_hash=NULL, @model_id=''charm-agent'', @prompt_version=''v6'', @high_count=', string(coalesce(triggerBody()?['high_count'],0)), ', @med_count=', string(coalesce(triggerBody()?['med_count'],0)), ', @low_count=', string(coalesce(triggerBody()?['low_count'],0)), ', @run_id=@run OUTPUT; SELECT CONVERT(varchar(36),@run) AS run_id;'), 'THROW 50000, ''FLAGS_REQUIRED'', 1;')}\n"
+          },
+          "host": {
+            "connection": {
+              "name": "@parameters('$connections')['sql']['connectionId']"
+            }
+          },
+          "method": "post",
+          "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('${SQL_SERVER_FQDN}'))},@{encodeURIComponent(encodeURIComponent('${SQL_DATABASE_NAME}'))}/query/sql"
+        },
+        "type": "ApiConnection"
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {},
+    "parameters": {
+      "$connections": {
+        "defaultValue": {},
+        "type": "Object"
+      }
+    },
+    "triggers": {
+      "When_an_HTTP_request_is_received": {
+        "inputs": {
+          "method": "POST",
+          "schema": {
+            "properties": {
+              "business_unit": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "citations": {
+                "items": {
+                  "properties": {
+                    "clause_id": {
+                      "type": "string"
+                    },
+                    "doc_title": {
+                      "type": "string"
+                    },
+                    "language": {
+                      "type": "string"
+                    },
+                    "page": {
+                      "type": "integer"
+                    },
+                    "requirement_id": {},
+                    "source_type": {
+                      "type": "string"
+                    },
+                    "source_url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "doc_title",
+                    "page",
+                    "source_url",
+                    "source_type",
+                    "requirement_id",
+                    "clause_id",
+                    "language"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "confidence": {
+                "type": "number"
+              },
+              "critical_count": {
+                "type": "integer"
+              },
+              "flag_key": {
+                "type": "string"
+              },
+              "flags": {
+                "items": {
+                  "properties": {
+                    "business_unit": {
+                      "type": "string"
+                    },
+                    "category": {
+                      "type": "string"
+                    },
+                    "citations": {
+                      "items": {
+                        "properties": {
+                          "clause_id": {
+                            "type": "string"
+                          },
+                          "doc_title": {
+                            "type": "string"
+                          },
+                          "language": {
+                            "type": "string"
+                          },
+                          "page": {
+                            "type": "integer"
+                          },
+                          "requirement_id": {},
+                          "source_type": {
+                            "type": "string"
+                          },
+                          "source_url": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "doc_title",
+                          "page",
+                          "source_url",
+                          "source_type",
+                          "requirement_id",
+                          "clause_id",
+                          "language"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "confidence": {
+                      "type": "number"
+                    },
+                    "flag_key": {
+                      "type": "string"
+                    },
+                    "impact": {
+                      "type": "integer"
+                    },
+                    "issue": {
+                      "type": "string"
+                    },
+                    "language": {
+                      "type": "string"
+                    },
+                    "likelihood": {
+                      "type": "integer"
+                    },
+                    "project_number": {
+                      "type": "string"
+                    },
+                    "rationale": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "category",
+                    "severity",
+                    "issue",
+                    "rationale"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "high_count": {
+                "type": "integer"
+              },
+              "impact": {
+                "type": "integer"
+              },
+              "issue": {
+                "type": "string"
+              },
+              "language": {
+                "type": "string"
+              },
+              "likelihood": {
+                "type": "integer"
+              },
+              "low_count": {
+                "type": "integer"
+              },
+              "med_count": {
+                "type": "integer"
+              },
+              "op": {
+                "type": "string"
+              },
+              "overall_score": {
+                "type": "number"
+              },
+              "possible_count": {
+                "type": "integer"
+              },
+              "project_number": {
+                "type": "string"
+              },
+              "rationale": {
+                "type": "string"
+              },
+              "run_id": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "project_number",
+              "title",
+              "business_unit",
+              "language",
+              "flags"
+            ],
+            "type": "object"
+          }
+        },
+        "kind": "Http",
+        "type": "Request"
+      }
+    }
+  }
+}

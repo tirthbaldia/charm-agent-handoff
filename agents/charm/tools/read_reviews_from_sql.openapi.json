@@ -1,0 +1,83 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Read Reviews From SQL",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "${LOGICAPP_READER_SERVER_URL}"
+    }
+  ],
+  "paths": {
+    "/invoke": {
+      "post": {
+        "operationId": "readReviews",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "api-version",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "2019-05-01"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sp",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "/triggers/When_an_HTTP_request_is_received/run"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sv",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "1.0"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sig",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "${LOGICAPP_CALLBACK_SIG}"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "project_number": {
+                    "type": "string",
+                    "maxLength": 50
+                  },
+                  "top_n": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 200
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    }
+  }
+}
