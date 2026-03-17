@@ -18,7 +18,7 @@ Apply scripts in order:
 4. `db/sql/20_uc1_views.sql`
 5. `db/sql/30_uc1_smoke_tests.sql`
 
-For in-place upgrades, run steps `2-5` (skip `00` to preserve data).
+For in-place upgrades, run steps `2-5`.
 
 ## 3) Logic Apps
 - Deploy or update workflow definitions in `logicapps/`.
